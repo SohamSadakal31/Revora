@@ -227,3 +227,20 @@ experiments/**/*.joblib
 # Generated PDF documents
 *.pdf
 
+# Internal PDF/documentation generation scripts (keep local, exclude from GitHub)
+build_full_50page_doc.py
+build_full_doc_runner.py
+build_step1_cover_toc.py
+doc_appendices.py
+doc_part1.py
+doc_part2.py
+doc_part3.py
+doc_part4.py
+doc_part5.py
+doc_part6.py
+doc_part7.py
+doc_part8.py
+doc_part9.py
+generate_comprehensive_50p_doc.py
+generate_project_pdf.py
+pdf_builder_core.py
