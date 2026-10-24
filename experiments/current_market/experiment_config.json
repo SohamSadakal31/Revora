@@ -1,0 +1,25 @@
+{
+  "historical_listing_year": 2020,
+  "historical_listing_year_confirmed": false,
+  "holdout_fraction": 0.2,
+  "historical_weight": 1.0,
+  "current_weight": 2.0,
+  "run_city_experiment": false,
+  "min_city_train_rows": 30,
+  "min_group_rows": 20,
+  "min_current_rows": 50,
+  "allow_invalid_rows": false,
+  "model_params": {
+    "loss": "squared_error",
+    "learning_rate": 0.05,
+    "max_iter": 1500,
+    "max_leaf_nodes": 15,
+    "min_samples_leaf": 5,
+    "l2_regularization": 1.0,
+    "early_stopping": false,
+    "random_state": 42
+  },
+  "historical_path": "data/car-details-cleaned.csv",
+  "current_path": "data/current-listings.csv",
+  "output_dir": "experiments/current_market"
+}

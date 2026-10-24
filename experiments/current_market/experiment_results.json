@@ -1,0 +1,903 @@
+{
+  "created_at": "2026-09-30T09:53:28+00:00",
+  "config": {
+    "historical_listing_year": 2020,
+    "historical_listing_year_confirmed": false,
+    "holdout_fraction": 0.2,
+    "historical_weight": 1.0,
+    "current_weight": 2.0,
+    "run_city_experiment": false,
+    "min_city_train_rows": 30,
+    "min_group_rows": 20,
+    "min_current_rows": 50,
+    "allow_invalid_rows": false,
+    "model_params": {
+      "loss": "squared_error",
+      "learning_rate": 0.05,
+      "max_iter": 1500,
+      "max_leaf_nodes": 15,
+      "min_samples_leaf": 5,
+      "l2_regularization": 1.0,
+      "early_stopping": false,
+      "random_state": 42
+    },
+    "historical_path": "data/car-details-cleaned.csv",
+    "current_path": "data/current-listings.csv",
+    "output_dir": "experiments/current_market"
+  },
+  "data": {
+    "historical_rows": 6926,
+    "current": {
+      "total_rows": 8676,
+      "valid_rows": 8676,
+      "invalid_rows": 0,
+      "listing_date_range": [
+        "2019-08-21",
+        "2023-01-14"
+      ],
+      "companies": 34,
+      "models": 229,
+      "cities": 78,
+      "fuel": {
+        "petrol": 5164,
+        "diesel": 3034,
+        "cng": 433,
+        "lpg": 45
+      },
+      "transmission": {
+        "manual": 7199,
+        "automatic": 1477
+      },
+      "seller_type": {
+        "dealer": 6676,
+        "individual": 2000
+      },
+      "price_range": [
+        20000,
+        35000000
+      ],
+      "year_range": [
+        1988,
+        2022
+      ],
+      "km_range": [
+        60,
+        2000000
+      ],
+      "missing_specs_in_file": {
+        "mileage_mpg": 8676,
+        "engine_cc": 6778,
+        "max_power_bhp": 6901,
+        "torque_nm": 6901,
+        "seats": 6770
+      },
+      "duplicate_listing_ids": 0,
+      "repeated_cars_same_details": 5,
+      "warnings": [
+        "1 rows are exact repeats of another listing (kept, grouped for splits)"
+      ]
+    },
+    "split": {
+      "current_training_rows": 6939,
+      "current_holdout_rows": 1737,
+      "current_training_last_date": "2023-01-14",
+      "holdout_first_date": "2023-01-14",
+      "holdout_last_date": "2023-01-14"
+    }
+  },
+  "spec_coverage": {
+    "historical": {
+      "mileage_mpg": {
+        "provided": 6616,
+        "missing": 254,
+        "lookup_variant": 47,
+        "lookup_same_year": 9
+      },
+      "engine_cc": {
+        "provided": 6718,
+        "missing": 150,
+        "lookup_variant": 47,
+        "lookup_same_year": 11
+      },
+      "max_power_bhp": {
+        "provided": 6717,
+        "missing": 151,
+        "lookup_variant": 31,
+        "conflict": 16,
+        "lookup_same_year": 11
+      },
+      "torque_nm": {
+        "provided": 6717,
+        "missing": 151,
+        "lookup_variant": 47,
+        "lookup_same_year": 11
+      },
+      "seats": {
+        "provided": 6718,
+        "missing": 150,
+        "lookup_variant": 47,
+        "lookup_same_year": 11
+      },
+      "rows_with_all_specs": 6656,
+      "rows": 6926
+    },
+    "current_training": {
+      "mileage_mpg": {
+        "missing": 4867,
+        "lookup_same_year": 1151,
+        "lookup_variant": 494,
+        "conflict": 427
+      },
+      "engine_cc": {
+        "missing": 4486,
+        "lookup_same_year": 1460,
+        "lookup_variant": 767,
+        "provided": 220,
+        "conflict": 6
+      },
+      "max_power_bhp": {
+        "missing": 4489,
+        "lookup_same_year": 1336,
+        "lookup_variant": 541,
+        "conflict": 358,
+        "provided": 215
+      },
+      "torque_nm": {
+        "missing": 4489,
+        "lookup_same_year": 1399,
+        "lookup_variant": 645,
+        "provided": 215,
+        "conflict": 191
+      },
+      "seats": {
+        "missing": 4486,
+        "lookup_same_year": 1460,
+        "lookup_variant": 771,
+        "provided": 220,
+        "conflict": 2
+      },
+      "rows_with_all_specs": 1548,
+      "rows": 6939
+    },
+    "current_holdout": {
+      "mileage_mpg": {
+        "missing": 1441,
+        "lookup_same_year": 138,
+        "lookup_variant": 102,
+        "conflict": 56
+      },
+      "engine_cc": {
+        "provided": 1678,
+        "missing": 50,
+        "lookup_variant": 7,
+        "lookup_same_year": 2
+      },
+      "max_power_bhp": {
+        "provided": 1560,
+        "missing": 113,
+        "lookup_same_year": 32,
+        "lookup_variant": 17,
+        "conflict": 15
+      },
+      "torque_nm": {
+        "provided": 1560,
+        "missing": 113,
+        "lookup_same_year": 32,
+        "lookup_variant": 26,
+        "conflict": 6
+      },
+      "seats": {
+        "provided": 1686,
+        "missing": 42,
+        "lookup_variant": 7,
+        "lookup_same_year": 2
+      },
+      "rows_with_all_specs": 238,
+      "rows": 1737
+    }
+  },
+  "training_rows": {
+    "A_historical": 6926,
+    "B_historical_current": 13865,
+    "C_weighted": 13865
+  },
+  "city_experiment": null,
+  "historical_dataset": {
+    "dataset": "data/car-details-cleaned.csv",
+    "cleaned": true,
+    "rows": 6926,
+    "mileage_values_changed": 102,
+    "non_mileage_columns_identical": true,
+    "matches_cleaning_rules": true
+  },
+  "gas_mileage_coverage": {
+    "historical": {
+      "CNG": {
+        "rows": 56,
+        "with_mileage": 0,
+        "missing_mileage": 56
+      },
+      "LPG": {
+        "rows": 38,
+        "with_mileage": 0,
+        "missing_mileage": 38
+      }
+    },
+    "missing_mileage_in_training": {
+      "A_historical": 254,
+      "B_historical_current": 5548,
+      "C_weighted": 5548
+    },
+    "pipeline": "trained and predicted with missing mileage left as NaN (handled natively, not filled)"
+  },
+  "leakage_audit": {
+    "current holdout never entered training": true,
+    "current holdout never entered spec lookup": true,
+    "current holdout never influenced preprocessing": true,
+    "current holdout never influenced hyperparameters": true,
+    "current holdout never influenced sample weights": true,
+    "target price was not used for spec enrichment": true,
+    "no future listing information leaked into training": true,
+    "duplicate listings did not cross train/holdout": true,
+    "test metrics calculated only after predictions were generated": true,
+    "historical data contains no target leakage": true
+  },
+  "results": {
+    "A_historical": {
+      "overall": {
+        "rows": 1737,
+        "mae": 500159.3142414622,
+        "rmse": 1489225.5099608437,
+        "r2": 0.5504817015545671,
+        "median_abs_error": 160417.2230126136,
+        "median_pct_error": 0.2288956940948755,
+        "within_10pct": 0.16177317213586645,
+        "within_20pct": 0.41508347725964306,
+        "actual_range": [
+          49000.0,
+          27500000.0
+        ],
+        "prediction_range": [
+          61564.8760661422,
+          8723111.352964027
+        ]
+      },
+      "by_price_bucket": {
+        "<2L": {
+          "rows": 49,
+          "mae": 41510.272771813055,
+          "median_pct_error": 0.23415334580761488,
+          "within_10pct": 0.14285714285714285,
+          "within_20pct": 0.40816326530612246
+        },
+        "2-5L": {
+          "rows": 449,
+          "mae": 86437.46028487274,
+          "median_pct_error": 0.2373229488792941,
+          "within_10pct": 0.1603563474387528,
+          "within_20pct": 0.39643652561247217
+        },
+        "5-10L": {
+          "rows": 517,
+          "mae": 159207.90834944393,
+          "median_pct_error": 0.20964527888800483,
+          "within_10pct": 0.11605415860735009,
+          "within_20pct": 0.4526112185686654
+        },
+        "10-20L": {
+          "rows": 337,
+          "mae": 352493.363791268,
+          "median_pct_error": 0.22726608239250112,
+          "within_10pct": 0.20474777448071216,
+          "within_20pct": 0.42433234421364985
+        },
+        ">20L": {
+          "rows": 385,
+          "mae": 1628133.9054269437,
+          "median_pct_error": 0.2715188138553548,
+          "within_10pct": 0.18961038961038962,
+          "within_20pct": 0.37922077922077924
+        }
+      },
+      "by_company": {
+        "audi": {
+          "rows": 96,
+          "mae": 694173.4596076575,
+          "median_pct_error": 0.2381927856996335,
+          "within_10pct": 0.19791666666666666,
+          "within_20pct": 0.3958333333333333
+        },
+        "bmw": {
+          "rows": 104,
+          "mae": 770735.2251490976,
+          "median_pct_error": 0.18966570936415328,
+          "within_10pct": 0.2692307692307692,
+          "within_20pct": 0.5096153846153846
+        },
+        "ford": {
+          "rows": 41,
+          "mae": 168679.43459019548,
+          "median_pct_error": 0.15145597030128619,
+          "within_10pct": 0.36585365853658536,
+          "within_20pct": 0.7073170731707317
+        },
+        "honda": {
+          "rows": 133,
+          "mae": 127701.26211956586,
+          "median_pct_error": 0.20895872884946798,
+          "within_10pct": 0.15037593984962405,
+          "within_20pct": 0.45864661654135336
+        },
+        "hyundai": {
+          "rows": 313,
+          "mae": 147015.71903540945,
+          "median_pct_error": 0.21195643827141264,
+          "within_10pct": 0.15654952076677317,
+          "within_20pct": 0.43769968051118213
+        },
+        "kia": {
+          "rows": 21,
+          "mae": 435313.02693918196,
+          "median_pct_error": 0.30372004985550516,
+          "within_10pct": 0.14285714285714285,
+          "within_20pct": 0.2857142857142857
+        },
+        "land": {
+          "rows": 29,
+          "mae": 4145322.3647422544,
+          "median_pct_error": 0.46205581243209903,
+          "within_10pct": 0.0,
+          "within_20pct": 0.034482758620689655
+        },
+        "mahindra": {
+          "rows": 106,
+          "mae": 199242.87614879644,
+          "median_pct_error": 0.17729090681981122,
+          "within_10pct": 0.24528301886792453,
+          "within_20pct": 0.5943396226415094
+        },
+        "maruti": {
+          "rows": 374,
+          "mae": 123073.54843258491,
+          "median_pct_error": 0.2384637192555258,
+          "within_10pct": 0.09090909090909091,
+          "within_20pct": 0.38235294117647056
+        },
+        "mercedes-benz": {
+          "rows": 140,
+          "mae": 1444047.7227699207,
+          "median_pct_error": 0.3601583448738154,
+          "within_10pct": 0.11428571428571428,
+          "within_20pct": 0.22857142857142856
+        },
+        "renault": {
+          "rows": 36,
+          "mae": 107866.40912437481,
+          "median_pct_error": 0.2280652316047192,
+          "within_10pct": 0.16666666666666666,
+          "within_20pct": 0.4444444444444444
+        },
+        "skoda": {
+          "rows": 34,
+          "mae": 465396.39594118187,
+          "median_pct_error": 0.33350209670218206,
+          "within_10pct": 0.17647058823529413,
+          "within_20pct": 0.29411764705882354
+        },
+        "tata": {
+          "rows": 39,
+          "mae": 181216.69058978165,
+          "median_pct_error": 0.22670590882214509,
+          "within_10pct": 0.20512820512820512,
+          "within_20pct": 0.38461538461538464
+        },
+        "toyota": {
+          "rows": 110,
+          "mae": 288547.0841501759,
+          "median_pct_error": 0.17053807197755427,
+          "within_10pct": 0.2727272727272727,
+          "within_20pct": 0.5818181818181818
+        },
+        "volkswagen": {
+          "rows": 43,
+          "mae": 230763.4263685677,
+          "median_pct_error": 0.26565716703583653,
+          "within_10pct": 0.06976744186046512,
+          "within_20pct": 0.32558139534883723
+        }
+      },
+      "by_age_bucket": {
+        "0-3y": {
+          "rows": 286,
+          "mae": 839690.3796474291,
+          "median_pct_error": 0.19453009577119618,
+          "within_10pct": 0.24125874125874125,
+          "within_20pct": 0.5104895104895105
+        },
+        "4-6y": {
+          "rows": 626,
+          "mae": 469639.10314510996,
+          "median_pct_error": 0.1977973750272409,
+          "within_10pct": 0.1757188498402556,
+          "within_20pct": 0.5047923322683706
+        },
+        "7-10y": {
+          "rows": 598,
+          "mae": 413276.32799374347,
+          "median_pct_error": 0.2557010526180713,
+          "within_10pct": 0.12709030100334448,
+          "within_20pct": 0.34782608695652173
+        },
+        "11-15y": {
+          "rows": 217,
+          "mae": 392168.97746940295,
+          "median_pct_error": 0.31921704149643726,
+          "within_10pct": 0.11981566820276497,
+          "within_20pct": 0.22119815668202766
+        }
+      },
+      "by_fuel": {
+        "cng": {
+          "rows": 45,
+          "mae": 132935.59563109805,
+          "median_pct_error": 0.288180904343067,
+          "within_10pct": 0.0,
+          "within_20pct": 0.13333333333333333
+        },
+        "diesel": {
+          "rows": 896,
+          "mae": 595768.0025823786,
+          "median_pct_error": 0.20537435342396962,
+          "within_10pct": 0.21651785714285715,
+          "within_20pct": 0.47433035714285715
+        },
+        "petrol": {
+          "rows": 790,
+          "mae": 415906.45452760014,
+          "median_pct_error": 0.24269210138907876,
+          "within_10pct": 0.10886075949367088,
+          "within_20pct": 0.3658227848101266
+        }
+      }
+    },
+    "B_historical_current": {
+      "overall": {
+        "rows": 1737,
+        "mae": 388063.9550110915,
+        "rmse": 1340259.8171199856,
+        "r2": 0.6359136179099045,
+        "median_abs_error": 89963.62719090763,
+        "median_pct_error": 0.11795288102844353,
+        "within_10pct": 0.41968911917098445,
+        "within_20pct": 0.7104202648244099,
+        "actual_range": [
+          49000.0,
+          27500000.0
+        ],
+        "prediction_range": [
+          67687.18890836576,
+          13363915.947297575
+        ]
+      },
+      "by_price_bucket": {
+        "<2L": {
+          "rows": 49,
+          "mae": 54063.87365942495,
+          "median_pct_error": 0.32823083714004064,
+          "within_10pct": 0.14285714285714285,
+          "within_20pct": 0.24489795918367346
+        },
+        "2-5L": {
+          "rows": 449,
+          "mae": 50707.36356974647,
+          "median_pct_error": 0.10401840209630256,
+          "within_10pct": 0.48329621380846327,
+          "within_20pct": 0.755011135857461
+        },
+        "5-10L": {
+          "rows": 517,
+          "mae": 94159.57797092358,
+          "median_pct_error": 0.10168948734036316,
+          "within_10pct": 0.48936170212765956,
+          "within_20pct": 0.8259187620889749
+        },
+        "10-20L": {
+          "rows": 337,
+          "mae": 228090.5858567191,
+          "median_pct_error": 0.11803780914349116,
+          "within_10pct": 0.4065281899109792,
+          "within_20pct": 0.7240356083086054
+        },
+        ">20L": {
+          "rows": 385,
+          "mae": 1358709.9339154703,
+          "median_pct_error": 0.17506997773787528,
+          "within_10pct": 0.2987012987012987,
+          "within_20pct": 0.5506493506493506
+        }
+      },
+      "by_company": {
+        "audi": {
+          "rows": 96,
+          "mae": 472741.6889903454,
+          "median_pct_error": 0.11375595444730166,
+          "within_10pct": 0.4270833333333333,
+          "within_20pct": 0.6979166666666666
+        },
+        "bmw": {
+          "rows": 104,
+          "mae": 876788.8392192053,
+          "median_pct_error": 0.16777177231426044,
+          "within_10pct": 0.3173076923076923,
+          "within_20pct": 0.5673076923076923
+        },
+        "ford": {
+          "rows": 41,
+          "mae": 177288.98714967718,
+          "median_pct_error": 0.1448216026369317,
+          "within_10pct": 0.3902439024390244,
+          "within_20pct": 0.6829268292682927
+        },
+        "honda": {
+          "rows": 133,
+          "mae": 70105.71803109536,
+          "median_pct_error": 0.0902447820915939,
+          "within_10pct": 0.5488721804511278,
+          "within_20pct": 0.8345864661654135
+        },
+        "hyundai": {
+          "rows": 313,
+          "mae": 76219.98075156321,
+          "median_pct_error": 0.08669436965533474,
+          "within_10pct": 0.5623003194888179,
+          "within_20pct": 0.8370607028753994
+        },
+        "kia": {
+          "rows": 21,
+          "mae": 333085.03349360137,
+          "median_pct_error": 0.2089243262528608,
+          "within_10pct": 0.2857142857142857,
+          "within_20pct": 0.47619047619047616
+        },
+        "land": {
+          "rows": 29,
+          "mae": 2918979.306370923,
+          "median_pct_error": 0.25602306977356637,
+          "within_10pct": 0.10344827586206896,
+          "within_20pct": 0.20689655172413793
+        },
+        "mahindra": {
+          "rows": 106,
+          "mae": 193248.32254075952,
+          "median_pct_error": 0.11078543840819405,
+          "within_10pct": 0.4528301886792453,
+          "within_20pct": 0.6792452830188679
+        },
+        "maruti": {
+          "rows": 374,
+          "mae": 68415.80351751937,
+          "median_pct_error": 0.10891368880642383,
+          "within_10pct": 0.4411764705882353,
+          "within_20pct": 0.7967914438502673
+        },
+        "mercedes-benz": {
+          "rows": 140,
+          "mae": 868245.0582613185,
+          "median_pct_error": 0.1541408490790287,
+          "within_10pct": 0.32142857142857145,
+          "within_20pct": 0.6
+        },
+        "renault": {
+          "rows": 36,
+          "mae": 78242.77407243452,
+          "median_pct_error": 0.14358774857312678,
+          "within_10pct": 0.3611111111111111,
+          "within_20pct": 0.5833333333333334
+        },
+        "skoda": {
+          "rows": 34,
+          "mae": 296177.4480026562,
+          "median_pct_error": 0.1503969939272405,
+          "within_10pct": 0.3235294117647059,
+          "within_20pct": 0.6764705882352942
+        },
+        "tata": {
+          "rows": 39,
+          "mae": 138646.85542819303,
+          "median_pct_error": 0.11381961150229113,
+          "within_10pct": 0.41025641025641024,
+          "within_20pct": 0.7692307692307693
+        },
+        "toyota": {
+          "rows": 110,
+          "mae": 259795.59413831,
+          "median_pct_error": 0.12638651910356233,
+          "within_10pct": 0.37272727272727274,
+          "within_20pct": 0.7090909090909091
+        },
+        "volkswagen": {
+          "rows": 43,
+          "mae": 198979.45711404996,
+          "median_pct_error": 0.14717814542485716,
+          "within_10pct": 0.2558139534883721,
+          "within_20pct": 0.6511627906976745
+        }
+      },
+      "by_age_bucket": {
+        "0-3y": {
+          "rows": 286,
+          "mae": 734855.8621703109,
+          "median_pct_error": 0.12414003979909265,
+          "within_10pct": 0.3881118881118881,
+          "within_20pct": 0.6748251748251748
+        },
+        "4-6y": {
+          "rows": 626,
+          "mae": 379388.36464182707,
+          "median_pct_error": 0.11144274214443226,
+          "within_10pct": 0.4424920127795527,
+          "within_20pct": 0.7587859424920128
+        },
+        "7-10y": {
+          "rows": 598,
+          "mae": 262341.3263519512,
+          "median_pct_error": 0.11015081871496307,
+          "within_10pct": 0.45652173913043476,
+          "within_20pct": 0.7274247491638796
+        },
+        "11-15y": {
+          "rows": 217,
+          "mae": 311152.038808146,
+          "median_pct_error": 0.1696259373654901,
+          "within_10pct": 0.3087557603686636,
+          "within_20pct": 0.5990783410138248
+        }
+      },
+      "by_fuel": {
+        "cng": {
+          "rows": 45,
+          "mae": 59423.76008084311,
+          "median_pct_error": 0.1032974979278345,
+          "within_10pct": 0.4444444444444444,
+          "within_20pct": 0.8222222222222222
+        },
+        "diesel": {
+          "rows": 896,
+          "mae": 445174.9631355783,
+          "median_pct_error": 0.1278196396602152,
+          "within_10pct": 0.3861607142857143,
+          "within_20pct": 0.6774553571428571
+        },
+        "petrol": {
+          "rows": 790,
+          "mae": 344518.1563224165,
+          "median_pct_error": 0.10887372338480097,
+          "within_10pct": 0.4569620253164557,
+          "within_20pct": 0.7443037974683544
+        }
+      }
+    },
+    "C_weighted": {
+      "overall": {
+        "rows": 1737,
+        "mae": 398762.0852617987,
+        "rmse": 1352059.37049435,
+        "r2": 0.6294746159580782,
+        "median_abs_error": 89161.08963506646,
+        "median_pct_error": 0.1240370624638978,
+        "within_10pct": 0.4231433506044905,
+        "within_20pct": 0.7046632124352331,
+        "actual_range": [
+          49000.0,
+          27500000.0
+        ],
+        "prediction_range": [
+          77454.72232715528,
+          14071639.978944447
+        ]
+      },
+      "by_price_bucket": {
+        "<2L": {
+          "rows": 49,
+          "mae": 58597.85452410572,
+          "median_pct_error": 0.3173078001224589,
+          "within_10pct": 0.10204081632653061,
+          "within_20pct": 0.22448979591836735
+        },
+        "2-5L": {
+          "rows": 449,
+          "mae": 51497.79954486369,
+          "median_pct_error": 0.10576047139827038,
+          "within_10pct": 0.47438752783964366,
+          "within_20pct": 0.7616926503340757
+        },
+        "5-10L": {
+          "rows": 517,
+          "mae": 97158.79577668081,
+          "median_pct_error": 0.10512127258352393,
+          "within_10pct": 0.47775628626692457,
+          "within_20pct": 0.8104448742746615
+        },
+        "10-20L": {
+          "rows": 337,
+          "mae": 223034.14793791942,
+          "median_pct_error": 0.11139621189926009,
+          "within_10pct": 0.4421364985163205,
+          "within_20pct": 0.7210682492581603
+        },
+        ">20L": {
+          "rows": 385,
+          "mae": 1405876.1817163548,
+          "median_pct_error": 0.18436191622680462,
+          "within_10pct": 0.3142857142857143,
+          "within_20pct": 0.5428571428571428
+        }
+      },
+      "by_company": {
+        "audi": {
+          "rows": 96,
+          "mae": 485157.35288606584,
+          "median_pct_error": 0.128570557273254,
+          "within_10pct": 0.4375,
+          "within_20pct": 0.6979166666666666
+        },
+        "bmw": {
+          "rows": 104,
+          "mae": 993751.1267902473,
+          "median_pct_error": 0.17239707440377217,
+          "within_10pct": 0.3269230769230769,
+          "within_20pct": 0.5480769230769231
+        },
+        "ford": {
+          "rows": 41,
+          "mae": 213761.85043735994,
+          "median_pct_error": 0.14701746546911892,
+          "within_10pct": 0.24390243902439024,
+          "within_20pct": 0.6097560975609756
+        },
+        "honda": {
+          "rows": 133,
+          "mae": 66944.33323108658,
+          "median_pct_error": 0.10239302979194174,
+          "within_10pct": 0.48120300751879697,
+          "within_20pct": 0.8345864661654135
+        },
+        "hyundai": {
+          "rows": 313,
+          "mae": 73086.8247515677,
+          "median_pct_error": 0.08210630470985933,
+          "within_10pct": 0.5846645367412141,
+          "within_20pct": 0.8274760383386581
+        },
+        "kia": {
+          "rows": 21,
+          "mae": 348100.99885888596,
+          "median_pct_error": 0.18434156797789944,
+          "within_10pct": 0.23809523809523808,
+          "within_20pct": 0.5714285714285714
+        },
+        "land": {
+          "rows": 29,
+          "mae": 2810216.152637968,
+          "median_pct_error": 0.3353941875932994,
+          "within_10pct": 0.1724137931034483,
+          "within_20pct": 0.27586206896551724
+        },
+        "mahindra": {
+          "rows": 106,
+          "mae": 175811.04344476608,
+          "median_pct_error": 0.11421950299075417,
+          "within_10pct": 0.4528301886792453,
+          "within_20pct": 0.7358490566037735
+        },
+        "maruti": {
+          "rows": 374,
+          "mae": 67622.81683633312,
+          "median_pct_error": 0.11428158368932498,
+          "within_10pct": 0.44919786096256686,
+          "within_20pct": 0.7780748663101604
+        },
+        "mercedes-benz": {
+          "rows": 140,
+          "mae": 958476.8138497148,
+          "median_pct_error": 0.1615344079816845,
+          "within_10pct": 0.35,
+          "within_20pct": 0.6214285714285714
+        },
+        "renault": {
+          "rows": 36,
+          "mae": 80844.39227964467,
+          "median_pct_error": 0.1338879142759557,
+          "within_10pct": 0.4444444444444444,
+          "within_20pct": 0.6111111111111112
+        },
+        "skoda": {
+          "rows": 34,
+          "mae": 330183.10772890184,
+          "median_pct_error": 0.1645146824952367,
+          "within_10pct": 0.2647058823529412,
+          "within_20pct": 0.5882352941176471
+        },
+        "tata": {
+          "rows": 39,
+          "mae": 129744.35996336423,
+          "median_pct_error": 0.13256134907795056,
+          "within_10pct": 0.4358974358974359,
+          "within_20pct": 0.717948717948718
+        },
+        "toyota": {
+          "rows": 110,
+          "mae": 260846.4363373987,
+          "median_pct_error": 0.1372538459815886,
+          "within_10pct": 0.35454545454545455,
+          "within_20pct": 0.6818181818181818
+        },
+        "volkswagen": {
+          "rows": 43,
+          "mae": 189035.7186352104,
+          "median_pct_error": 0.17431012458789283,
+          "within_10pct": 0.32558139534883723,
+          "within_20pct": 0.627906976744186
+        }
+      },
+      "by_age_bucket": {
+        "0-3y": {
+          "rows": 286,
+          "mae": 733053.8473746096,
+          "median_pct_error": 0.1316479048714908,
+          "within_10pct": 0.3916083916083916,
+          "within_20pct": 0.6783216783216783
+        },
+        "4-6y": {
+          "rows": 626,
+          "mae": 404446.0612051305,
+          "median_pct_error": 0.10719992172047683,
+          "within_10pct": 0.46325878594249204,
+          "within_20pct": 0.7476038338658147
+        },
+        "7-10y": {
+          "rows": 598,
+          "mae": 265156.9356582965,
+          "median_pct_error": 0.11624736352656125,
+          "within_10pct": 0.44816053511705684,
+          "within_20pct": 0.7324414715719063
+        },
+        "11-15y": {
+          "rows": 217,
+          "mae": 320434.8448906354,
+          "median_pct_error": 0.17460145663633217,
+          "within_10pct": 0.29493087557603687,
+          "within_20pct": 0.5576036866359447
+        }
+      },
+      "by_fuel": {
+        "cng": {
+          "rows": 45,
+          "mae": 61267.69213704126,
+          "median_pct_error": 0.13399307164865812,
+          "within_10pct": 0.4222222222222222,
+          "within_20pct": 0.7777777777777778
+        },
+        "diesel": {
+          "rows": 896,
+          "mae": 461396.8976661658,
+          "median_pct_error": 0.13106817726120118,
+          "within_10pct": 0.41517857142857145,
+          "within_20pct": 0.6785714285714286
+        },
+        "petrol": {
+          "rows": 790,
+          "mae": 349481.6748856805,
+          "median_pct_error": 0.11705885164189334,
+          "within_10pct": 0.43291139240506327,
+          "within_20pct": 0.7329113924050633
+        }
+      }
+    }
+  },
+  "production_checksums_unchanged": {
+    "app/models/model.joblib": "0c2008095689807fbcd81d7b5c41ac5e",
+    "app/models/model_range.joblib": "d7eaef871f1450e837cdb024023e182f",
+    "app/models/model_meta.json": "4e64554d7ee854a1c28cce418c1f6b0f"
+  }
+}

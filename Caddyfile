@@ -1,0 +1,6 @@
+# Public HTTPS entry point for the website (docker compose --profile https up -d).
+# Set DOMAIN in .env (e.g. DOMAIN=cars.example.com) and point the domain's DNS A record at this server.
+{$DOMAIN} {
+	encode gzip
+	reverse_proxy frontend:8501
+}

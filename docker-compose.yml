@@ -1,0 +1,124 @@
+
+services:
+  api:
+    build: .
+    container_name: fastapi-app
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      - API_KEY=${API_KEY:?API_KEY must be set in .env}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:?JWT_SECRET_KEY must be set in .env}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - REDIS_URL=redis://redis:6379
+      - USAGE_DB_PATH=/app/logs/usage.db
+      - USERS_DB_PATH=/app/logs/users.db
+      - JWT_EXPIRE_MINUTES=${JWT_EXPIRE_MINUTES:-30}
+      - LOGIN_MAX_FAILURES=${LOGIN_MAX_FAILURES:-5}
+      - LOGIN_LOCK_MINUTES=${LOGIN_LOCK_MINUTES:-15}
+      - RESET_CODE_MINUTES=${RESET_CODE_MINUTES:-30}
+      - EMAILS_PER_USER_PER_DAY=${EMAILS_PER_USER_PER_DAY:-20}
+      - QUOTE_BUSINESS_NAME=${QUOTE_BUSINESS_NAME:-Revora}
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USERNAME=${SMTP_USERNAME:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - SMTP_FROM=${SMTP_FROM:-}
+      - SMTP_STARTTLS=${SMTP_STARTTLS:-true}
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - redis
+      - prometheus
+    networks:
+      - backend
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: car-price-frontend
+    ports:
+      - "127.0.0.1:8501:8501"
+    environment:
+      - API_URL=http://api:8000
+      - API_KEY=${API_KEY:?API_KEY must be set in .env}
+    depends_on:
+      - api
+    networks:
+      - backend
+
+  backup:
+    build: .
+    container_name: db-backup
+    command: python -m app.services.backup --loop
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - USAGE_DB_PATH=/app/logs/usage.db
+      - USERS_DB_PATH=/app/logs/users.db
+      - BACKUP_DIR=/app/logs/backups
+      - BACKUP_INTERVAL_HOURS=${BACKUP_INTERVAL_HOURS:-24}
+      - BACKUP_KEEP=${BACKUP_KEEP:-14}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    depends_on:
+      - redis
+    networks:
+      - backend
+
+  # optional: public HTTPS for the website. Start with:  docker compose --profile https up -d
+  # needs DOMAIN in .env and the domain's DNS pointing at this server (Caddy gets the certificate automatically)
+  https:
+    image: caddy:2
+    container_name: https-proxy
+    profiles: ["https"]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - frontend
+    restart: unless-stopped
+    networks:
+      - backend
+
+  redis:
+    image: redis:8.10.2-alpine
+    container_name: redis1
+    networks:
+      - backend
+
+  prometheus:
+    image: prom/prometheus:v3.15.0
+    container_name: prometheus1
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "127.0.0.1:9090:9090"
+    networks:
+      - backend
+
+  grafana:
+    image: grafana/grafana:13.2.3
+    container_name: grafana1
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  caddy_data:
