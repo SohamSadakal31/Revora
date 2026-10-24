@@ -187,8 +187,16 @@ figures are served by `GET /health` and shown in the app.
 
 ### 1. Configure
 
+Copy the sanitized template to `.env`:
+
+**Linux / macOS:**
 ```bash
 cp .env.example .env
+```
+
+**Windows (PowerShell):**
+```powershell
+Copy-Item .env.example .env
 ```
 
 Edit `.env` and set **your own values** — see **Configuration** below. `.env` holds secrets and is
@@ -213,25 +221,37 @@ Stop with `docker compose down`.
 
 ### 2b. Run without Docker
 
+**Linux / macOS:**
 ```bash
 python3.10 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt -r requirements-dev.txt -r frontend/requirements.txt
-```
-
-The three requirement files are consistent (all use pandas 2.3.3), so they install into one environment.
-
-```bash
 uvicorn app.main:app --reload            # API on http://localhost:8000 (reads .env)
 ```
 
-In a second terminal (the frontend does not read `.env`, so pass the same API key):
-
+In a second terminal, launch the Streamlit frontend:
 ```bash
 cd frontend
 API_URL=http://localhost:8000 API_KEY=<the API_KEY from your .env> streamlit run app.py
 ```
 
+**Windows (PowerShell):**
+```powershell
+py -3.10 -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt -r requirements-dev.txt -r frontend/requirements.txt
+uvicorn app.main:app --reload            # API on http://localhost:8000 (reads .env)
+```
+
+In a second PowerShell terminal, launch the Streamlit frontend:
+```powershell
+cd frontend
+$env:API_URL="http://localhost:8000"
+$env:API_KEY="<the API_KEY from your .env>"
+streamlit run app.py
+```
+
+The three requirement files are consistent (all use pandas 2.3.3), so they install into one environment.
 Without a Redis server at `REDIS_URL`, the API simply runs without its cache.
 
 ---
@@ -242,10 +262,10 @@ All settings come from environment variables; `.env.example` lists them.
 
 | Variable | Purpose |
 |---|---|
-| `API_KEY` | Shared key the frontend sends in the `api-key` header |
+| `API_KEY` | Shared key required by protected API endpoints and sent by the frontend in the `api-key` header |
 | `JWT_SECRET_KEY`, `JWT_EXPIRE_MINUTES` | Signing secret and lifetime (default 30 min) of login tokens |
-| `ADMIN_USERNAME`, `ADMIN_PASSWORD` | The admin account (it lives only in `.env`) |
-| `REDIS_URL` | For running without Docker; Compose sets `redis://redis:6379` for the API |
+| `ADMIN_USERNAME`, `ADMIN_PASSWORD` | The bootstrap administrator account (credentials live only in `.env`) |
+| `REDIS_URL` | Redis connection URL; Docker Compose sets `redis://redis:6379` for containers |
 | `LOGIN_MAX_FAILURES`, `LOGIN_LOCK_MINUTES` | Lock-out after repeated wrong passwords (defaults 5 / 15 min) |
 | `RESET_CODE_MINUTES`, `EMAILS_PER_USER_PER_DAY` | Reset-code lifetime (30 min) and daily quotation-email limit (20) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_STARTTLS` | Outgoing email. Leave `SMTP_HOST` empty to switch password reset and emailed quotations off |
@@ -253,8 +273,30 @@ All settings come from environment variables; `.env.example` lists them.
 | `BACKUP_INTERVAL_HOURS`, `BACKUP_KEEP` | Backup frequency (24 h) and copies kept (14) |
 | `DOMAIN` | Public domain for the optional HTTPS service |
 
-If `API_KEY`, `JWT_SECRET_KEY` or `ADMIN_PASSWORD` is not set, the API falls back to **development defaults** and logs a
-warning. Always set long random values before anyone else can reach the app.
+### Secret Enforcement: Docker Compose vs. Direct Mode
+
+- **Docker Compose (Hardened Mode):**
+  `docker-compose.yml` uses strict variable interpolation assertions:
+  - `API_KEY=${API_KEY:?API_KEY must be set in .env}`
+  - `JWT_SECRET_KEY=${JWT_SECRET_KEY:?JWT_SECRET_KEY must be set in .env}`
+  - `ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}`
+  If `API_KEY` or `JWT_SECRET_KEY` is missing in `.env`, `docker compose` **refuses to start** and outputs an immediate descriptive error. Both `api` and `frontend` receive the identical interpolated `API_KEY`.
+- **Direct Mode (`uvicorn`):**
+  When running outside Docker, `app/core/config.py` loads `.env` directly and falls back to **development defaults** (`demo-key`, `secret`, `admin`) with logged warnings if secrets are omitted.
+
+### Generating Secure Production Secrets
+
+Before deploying to production, generate high-entropy random keys:
+
+```bash
+# 32-character URL-safe API key
+python -c "import secrets; print(secrets.token_urlsafe(24))"
+
+# 64-character hexadecimal JWT secret key
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Set these generated keys for `API_KEY`, `JWT_SECRET_KEY`, and a strong `ADMIN_PASSWORD` in your `.env`.
 
 ---
 
@@ -288,7 +330,7 @@ warning. Always set long random values before anyone else can reach the app.
 pytest -q
 ```
 
-With all three requirement files installed, the full suite runs: **140 tests, all passing**. The tests use temporary
+With all three requirement files installed, the full suite runs: **132 passed, 1 skipped (0 failures)**. The tests use temporary
 SQLite databases and need no Redis, SMTP or Docker. If only `requirements.txt` and `requirements-dev.txt` are installed,
 the frontend tests (`tests/test_insights.py`, `tests/test_quote_pdf.py`) are skipped automatically.
 
@@ -314,14 +356,14 @@ images.
 
 Practical measures in place — this is a portfolio project, not a security-audited product:
 
-- **Secrets from the environment** (`.env`, git-ignored); the API warns when development defaults are in use.
-- **JWT authentication** (HS256, 30-minute tokens) plus an API key for the pricing endpoints. A deleted account's
-  tokens stop working immediately.
+- **Secrets from the environment** (`.env`, git-ignored); Docker Compose strictly enforces `API_KEY` and `JWT_SECRET_KEY` on startup, while direct execution warns when development defaults are in use.
+- **Container Isolation (Least Privilege):** Docker Compose explicitly scopes environment variables per container. The `frontend` and `backup` services are isolated from `SMTP_*` email credentials and `JWT_SECRET_KEY`.
+- **JWT authentication** (HS256, 30-minute tokens) plus an API key for the pricing endpoints. A deleted account's tokens stop working immediately.
+- **Key synchronization:** The API and Streamlit frontend are automatically bound to the exact same `API_KEY`.
 - **Passwords** stored as salted PBKDF2-SHA256 hashes (310,000 iterations) with constant-time comparison.
-- **Lock-out** after repeated failed logins; reset codes are hashed, expire, allow 5 guesses and are limited to
-  3 requests per hour; quotation emails are limited per user per day.
+- **Lock-out** after repeated failed logins; reset codes are hashed, expire, allow 5 guesses and are limited to 3 requests per hour; quotation emails are limited per user per day.
 - **Internal errors** are logged server-side and never returned to clients.
-- **Network exposure:** Redis has no published port, and the development ports listen on `127.0.0.1` only.
+- **Network exposure:** Redis has no published port, the backup worker communicates internally via `redis://redis:6379`, and development ports listen on `127.0.0.1` only.
 
 ---
 
